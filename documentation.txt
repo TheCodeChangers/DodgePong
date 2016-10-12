@@ -1,0 +1,205 @@
+
+ NOTE 10.10.16
+ 
+ BALL SEEMS TO LEAK THROUGH WALL OCCASIONALLY (ESPECIALLY WITH MOVING WALLS). THIS IS LIKELY DUE TO MY CRAPPY STOLEN RAYCASTING FUNCTION. WILL FIX SOON.
+
+
+
+ 
+ 
+ 
+
+
+
+  [walls]
+  Walls Array
+   An array containing all of the Wall Objects
+
+  [balls]
+  Balls Array
+   An array containing all of the Ball Objects
+
+
+  magnitude([x], [y]) 
+    Returns the hypotenuse length between of the x and y values
+    example:
+      magnitude(5, 8)
+      > 9.43398113206
+      
+  normalize([x], [y])
+    Returns an array containing x and y values where the magnitude of x and y is One. 
+    example : 
+    normalize(5, 8)
+    > [0.52999894, 0.847998304]
+    
+  checkLineIntersection([xa1], [ya1], [xa2], [ya2], [xb1], [yb1], [xb2], [yb2] )
+    Returns the intersection point between the two lines.
+    NOTE : This seems to be glitchy, so I will try to find a replacement function.
+  
+
+  createWall([DATA])
+  Returns a Wall Object with a set of functions and properties attached
+
+     requested properties of [DATA] object : 
+       x1 : X position of the first point
+       y1 : Y position of the first point
+       x2 : X position of the second point
+       y2 : Y position of the second point
+ 
+       Returns Wall Object    
+       Wall Object contains the following:
+
+         .x1 : X position of the first point     [NUMBER]
+         .y1 : Y position of the first point     [NUMBER]
+         .x2 : X position of the second point    [NUMBER]
+         .y2 : Y position of the second point    [NUMBER]
+   
+         .calculateNormals()                     [FUNCTION]
+           Returns an array containing the X and Y values for the wall's face direction
+         
+         .drawWall()                             [FUNCTION]
+           Renders the wall onto the canvas
+           Is called every frame by gameStep()
+           NOTE : Canvas is cleared every frame
+   
+ ------------------------------------------------------
+  // USAGE: 
+  
+  var data = {};
+  data.x1 = 0;
+  data.y1 = 20;
+  data.x2 = 400;
+  data.y2 = 30;
+ 
+ var wall = createWall(data);
+ var normals = wall.calculateNormals();
+ console.log(normals);
+ 
+  > [-0.024992191160203066, 0.9996876464081227]
+  
+ ------------------------------------------------------
+ 
+ 
+ 
+ createBall([DATA])
+ returns a Ball Object with a set of functions and properties attached
+    
+    requested properties of [DATA] object : 
+      x  : Starting X position of the ball       
+      y  : Starting Y position of the ball     
+      vx : Starting X Velocity for the ball     
+      vy : Starting Y Velocity for the ball     
+ 
+   
+      Returns Ball Object    
+      Ball Object contains the following:
+   
+     .x  : Starting X position of the ball       [NUMBER]
+     .y  : Starting Y position of the ball       [NUMBER]
+     .vx : Starting X Velocity for the ball      [NUMBER]
+     .vy : Starting Y Velocity for the ball      [NUMBER]
+     
+     .setPosition([x], [y])                      [FUNCTION]
+        A pretty way of setting the x and y values of the ball
+     
+     .setVelocity([x], [y])                      [FUNCTION]
+        A pretty way of setting the vx and vy values of the ball
+     
+     .updatePosition()                           [FUNCTION]
+        Sets position to position + velocity
+        Is called every .step()
+        
+     .calculatedSpeed()                          [FUNCTION]
+        Returns the magnitude of the ball's velocity
+        
+     .drawBall()                                 [FUNCTION]
+        Renders the ball onto the Canvas
+        Is called every frame by gameStep() function
+        NOTE : canvas is cleared every frame.
+        
+     .checkCollisionCourse()                     [FUNCTION]
+        Determines if the ball will collide with a wall depending on it's position and velocity. 
+        If it will collide, function returns the an Array with the following values :
+          - X position of where the ball intersects with the wall
+          - Y position of where the ball intersects with the wall
+          - Distance from the ball to the wall
+          - The Wall Object of the wall the ball is going to collide with
+        If it will not collide, function returns false.
+          
+     .getBounceDirection([intersectX], [intersectY], [normalX], [normalY])      [FUNCTION]
+        Returns the x and y position in an array of where the ball will go after it bounces off a wall with the normals normalX and normalY.
+        Best if used with .checkCollisionCourse() to get intersectX and intersectY and .calculateNormals() of the returned Wall Object.
+     
+     .step()                                     [FUNCTION]
+       Updates ball position and handles collision logic.
+       Is called every frame by gameStep() function
+          
+          
+          
+------------------------------------------------------
+// USAGE : 
+var data = {}
+ data.x = 200;
+ data.y = 200;
+ data.vx = 0;
+ data.vy = 3;
+ 
+var ball = createBall(data);
+
+console.log(ball.x, ball.y);
+> 200 200
+
+ball.setPosition(150, 400);
+
+console.log(ball.x, ball.y);
+> 150 400
+
+var speed = ball.calculatedSpeed();
+console.log(speed);
+> 3
+
+ball.setVelocity(2,2);
+ speed = ball.calculatedSpeed();
+
+console.log(speed);
+> 2.8284271247461903
+
+
+// all other functions are used by game's code and shouldn't be touched much.
+
+
+
+------------------------------------------------------
+          
+drawShape([sides], [radius], [cx], [cy], [r]) 
+  Draws a polygon with the amount of sides as definied by [sides] and a radius defined by [radius].
+  [cx] and [cy] and the center x and y positions for the polygon. [r] is the rotation of the polygon (In degrees).
+  
+  for example : 
+    drawShape(5, 30, 200, 200, 0);
+  Would draw a pentagon with no rotation. 
+  
+          
+
+
+[stages] 
+Stages Object
+
+  Contains a set of functions that can be called each frame to load a set of walls (and in the future, other stuffs) to the canvas. 
+  See setStage()
+  
+  
+setStage([stageName])     
+  Changes the current stage that is to be updated every frame. 
+  Calling this will refresh the balls on the screen.
+  
+  Heres a list of the current stages:
+  
+    - squareTest   [default]
+    - hexagonTest
+    - circleTest
+    - rotatingOctogon
+    - madness
+    
+    
+ 
